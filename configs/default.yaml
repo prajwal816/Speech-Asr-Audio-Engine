@@ -1,0 +1,107 @@
+# ============================================================
+# Speech Recognition & Audio Classification Engine — Config
+# ============================================================
+
+project:
+  name: "speech-asr-audio-engine"
+  seed: 42
+  device: "cpu"                       # "cpu" | "cuda"
+
+# ── Paths ────────────────────────────────────────────────────
+paths:
+  data_dir: "data/"
+  output_dir: "experiments/outputs/"
+  log_dir: "experiments/logs/"
+  model_dir: "experiments/models/"
+
+# ── Audio I/O ────────────────────────────────────────────────
+audio:
+  sample_rate: 16000
+  mono: true
+  max_duration_sec: 30.0
+
+# ── Feature Extraction ──────────────────────────────────────
+features:
+  mfcc:
+    n_mfcc: 13
+    n_fft: 2048
+    hop_length: 512
+    n_mels: 128
+  mel_spectrogram:
+    n_mels: 128
+    n_fft: 2048
+    hop_length: 512
+    power: 2.0
+  chroma:
+    n_chroma: 12
+    n_fft: 2048
+    hop_length: 512
+
+# ── ASR ──────────────────────────────────────────────────────
+asr:
+  whisper:
+    model_name: "openai/whisper-small"
+    language: "en"
+    task: "transcribe"
+    fine_tune:
+      epochs: 3
+      learning_rate: 1.0e-5
+      batch_size: 8
+      warmup_steps: 500
+  wav2vec2:
+    model_name: "facebook/wav2vec2-base-960h"
+    language: "en"
+
+# ── Speaker Diarization ─────────────────────────────────────
+diarization:
+  energy_threshold: 0.01
+  min_segment_sec: 0.5
+  max_speakers: 10
+  clustering:
+    method: "agglomerative"           # "agglomerative" | "spectral"
+    n_clusters: 2
+
+# ── Audio Classification ────────────────────────────────────
+classification:
+  num_classes: 10
+  labels:
+    - speech
+    - music
+    - applause
+    - laughter
+    - silence
+    - noise
+    - siren
+    - dog_bark
+    - car_horn
+    - gunshot
+  model:
+    n_mels: 128
+    hidden_channels: [32, 64, 128]
+    dropout: 0.3
+  training:
+    epochs: 20
+    learning_rate: 1.0e-3
+    batch_size: 32
+    patience: 5                       # early-stopping patience
+
+# ── Hybrid Pipeline ─────────────────────────────────────────
+pipeline:
+  enable_features: true
+  enable_asr: true
+  enable_diarization: true
+  enable_classification: true
+  asr_backend: "whisper"              # "whisper" | "wav2vec2"
+
+# ── Logging ──────────────────────────────────────────────────
+logging:
+  level: "INFO"                       # DEBUG | INFO | WARNING | ERROR
+  console: true
+  file: true
+  filename: "engine.log"
+
+# ── Experiment Tracking ─────────────────────────────────────
+experiment:
+  name: "baseline_v1"
+  tags: ["whisper", "mfcc", "multi-label"]
+  track_metrics: true
