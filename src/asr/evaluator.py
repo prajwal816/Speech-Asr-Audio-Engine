@@ -30,14 +30,6 @@ class ASREvaluator:
     0.5
     """
 
-    WER_TRANSFORM = jiwer.Compose([
-        jiwer.ToLowerCase(),
-        jiwer.RemoveMultipleSpaces(),
-        jiwer.Strip(),
-        jiwer.RemovePunctuation(),
-        jiwer.ReduceToListOfListOfWords(),
-    ])
-
     def evaluate(
         self,
         references: list[str],
@@ -64,12 +56,7 @@ class ASREvaluator:
             )
 
         # Aggregate WER
-        wer = jiwer.wer(
-            references,
-            hypotheses,
-            truth_transform=self.WER_TRANSFORM,
-            hypothesis_transform=self.WER_TRANSFORM,
-        )
+        wer = jiwer.wer(references, hypotheses)
 
         # Aggregate CER
         cer = jiwer.cer(references, hypotheses)
@@ -77,12 +64,7 @@ class ASREvaluator:
         # Per-sample metrics
         samples: list[dict[str, Any]] = []
         for ref, hyp in zip(references, hypotheses):
-            s_wer = jiwer.wer(
-                ref,
-                hyp,
-                truth_transform=self.WER_TRANSFORM,
-                hypothesis_transform=self.WER_TRANSFORM,
-            )
+            s_wer = jiwer.wer(ref, hyp)
             s_cer = jiwer.cer(ref, hyp)
             samples.append({
                 "reference": ref,

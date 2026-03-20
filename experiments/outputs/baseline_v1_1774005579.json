@@ -1,0 +1,166 @@
+{
+  "run_id": "baseline_v1_1774005579",
+  "experiment": "baseline_v1",
+  "tags": [
+    "whisper",
+    "mfcc",
+    "multi-label"
+  ],
+  "start_time": "2026-03-20T11:19:39.202167+00:00",
+  "params": {
+    "project": {
+      "name": "speech-asr-audio-engine",
+      "seed": 42,
+      "device": "cpu"
+    },
+    "paths": {
+      "data_dir": "data/",
+      "output_dir": "experiments/outputs/",
+      "log_dir": "experiments/logs/",
+      "model_dir": "experiments/models/"
+    },
+    "audio": {
+      "sample_rate": 16000,
+      "mono": true,
+      "max_duration_sec": 30.0
+    },
+    "features": {
+      "mfcc": {
+        "n_mfcc": 13,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "n_mels": 128
+      },
+      "mel_spectrogram": {
+        "n_mels": 128,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "power": 2.0
+      },
+      "chroma": {
+        "n_chroma": 12,
+        "n_fft": 2048,
+        "hop_length": 512
+      }
+    },
+    "asr": {
+      "whisper": {
+        "model_name": "openai/whisper-small",
+        "language": "en",
+        "task": "transcribe",
+        "fine_tune": {
+          "epochs": 3,
+          "learning_rate": 1e-05,
+          "batch_size": 8,
+          "warmup_steps": 500
+        }
+      },
+      "wav2vec2": {
+        "model_name": "facebook/wav2vec2-base-960h",
+        "language": "en"
+      }
+    },
+    "diarization": {
+      "energy_threshold": 0.01,
+      "min_segment_sec": 0.5,
+      "max_speakers": 10,
+      "clustering": {
+        "method": "agglomerative",
+        "n_clusters": 2
+      }
+    },
+    "classification": {
+      "num_classes": 10,
+      "labels": [
+        "speech",
+        "music",
+        "applause",
+        "laughter",
+        "silence",
+        "noise",
+        "siren",
+        "dog_bark",
+        "car_horn",
+        "gunshot"
+      ],
+      "model": {
+        "n_mels": 128,
+        "hidden_channels": [
+          32,
+          64,
+          128
+        ],
+        "dropout": 0.3
+      },
+      "training": {
+        "epochs": 20,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "patience": 5
+      }
+    },
+    "pipeline": {
+      "enable_features": true,
+      "enable_asr": true,
+      "enable_diarization": true,
+      "enable_classification": true,
+      "asr_backend": "whisper"
+    },
+    "logging": {
+      "level": "INFO",
+      "console": true,
+      "file": true,
+      "filename": "engine.log"
+    },
+    "experiment": {
+      "name": "baseline_v1",
+      "tags": [
+        "whisper",
+        "mfcc",
+        "multi-label"
+      ],
+      "track_metrics": true
+    }
+  },
+  "metrics": {
+    "feature_extraction_ms": 1768.379700000878,
+    "feat_mfcc_dim": 39,
+    "feat_mel_spectrogram_dim": 128,
+    "feat_chroma_dim": 12,
+    "num_diarization_segments": 2,
+    "num_speakers_detected": 2,
+    "wer": 0.0606,
+    "cer": 0.0093,
+    "classification_latency_ms": 17.56
+  },
+  "metrics_history": {
+    "feature_extraction_ms": [
+      1768.379700000878
+    ],
+    "feat_mfcc_dim": [
+      39
+    ],
+    "feat_mel_spectrogram_dim": [
+      128
+    ],
+    "feat_chroma_dim": [
+      12
+    ],
+    "num_diarization_segments": [
+      2
+    ],
+    "num_speakers_detected": [
+      2
+    ],
+    "wer": [
+      0.0606
+    ],
+    "cer": [
+      0.0093
+    ],
+    "classification_latency_ms": [
+      17.56
+    ]
+  },
+  "artifacts": []
+}
